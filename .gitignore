@@ -1,7 +1,7 @@
 .ipynb_checkpoints
 data
 TrainModel/models
-predict/__pycache__/
+predict/__pycache__
 ups
-TrainModel/__pycache__/
-TrainModel/__pycache__/
+TrainModel/__pycache__
+TrainModel/__pycache__
