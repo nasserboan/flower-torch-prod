@@ -1,9 +1,15 @@
 import os
+from flask import Flask
+from predict import TRANSF
+import glob
+import torch
+from TrainModel.train_model import _build_pretrained_model
+
 from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'ups'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -19,17 +25,25 @@ def upload_file():
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
+
         file = request.files['file']
+
         # if user does not select file, browser also
         # submit an empty part without filename
+
         if file.filename == '':
             flash('No selected file')
             return redirect(request.url)
+
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            
+            file.save(full_path)
 
-            return 'CRIAR TELA PREDICT'
+            return redirect(url_for('predict',path=filename))
+
             # return redirect(url_for('uploaded_file',
             #                         filename=filename))
     return '''
@@ -42,10 +56,31 @@ def upload_file():
     </form>
     '''
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
+
+
+@app.route('/predict/<path>')
+def predict(path):
+
+    image_tensor = TRANSF.transform_image('ups/'+path)
+
+    device = torch.device('cpu')
+    model = _build_pretrained_model(False)
+    model.load_state_dict(torch.load(glob.glob('TrainModel/models/*')[0],map_location=device))
+
+    return model
+
+
+
+
+
+
+
+
+
+# @app.route('/uploads/<filename>')
+# def uploaded_file(filename):
+#     return send_from_directory(app.config['UPLOAD_FOLDER'],
+#                                filename)
 
 if __name__ == "__main__":
     app.run(debug=True)
