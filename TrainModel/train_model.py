@@ -16,17 +16,17 @@ def _load_data(batch_size,num_workers) -> torch.utils.data.DataLoader:
     
     ## transformations
     data_transform = transforms.Compose([transforms.Resize((224,224)),
-                                         transforms.ToTensor()])
+                                        transforms.ToTensor()])
     ## selecting the folders
     train_data = datasets.ImageFolder(train_data_raw, transform=data_transform)
     test_data = datasets.ImageFolder(test_data_raw, transform=data_transform)
     
     ## loading the data
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=batch_size, 
-                                               num_workers=num_workers, shuffle=True)
+                                            num_workers=num_workers, shuffle=True)
     
     test_loader = torch.utils.data.DataLoader(test_data, batch_size=batch_size, 
-                                              num_workers=num_workers, shuffle=True)
+                                            num_workers=num_workers, shuffle=True)
     
     return train_loader, test_loader
 
@@ -107,7 +107,7 @@ def test_model(model:torchvision.models.vgg16, test:torch.utils.data.DataLoader)
 
 
 def save_model(model:torchvision.models.vgg16, acc:int):
-    torch.save(model.state_dict(),f'TrainModel/models/model{acc}')
+    torch.save(model,f'TrainModel/models/model{acc}')
 
 
 def main(wanted_acc:float):

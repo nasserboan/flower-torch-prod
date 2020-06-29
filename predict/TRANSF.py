@@ -8,5 +8,6 @@ def transform_image(path):
     
     image = Image.open(path)
     image = image_transform(image)
+    image = image.unsqueeze(0)
 
-    return image
+    return image.cpu()
